@@ -22,30 +22,22 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ success: false, error: 'User already exists' });
     }
 
-    // Set initial trust score to 80 (will become 100 once email verified)
+    // Automatically verify user on creation and start with 100 trust score
     const user = await User.create({
       name,
       email,
       password,
       gender,
       companyName,
-      trustScore: 80,
+      verified: true,
+      trustScore: 100,
       homeLocation: { address: '', lat: 0, lng: 0 },
       officeLocation: { address: '', lat: 0, lng: 0 },
     });
 
-    // Generate Verification OTP (6-digits)
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otp = otp;
-    user.otpExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins expiry
-    await user.save();
-
-    // Trigger Email sending async
-    await sendOTPEmail(email, otp, name);
-
     res.status(201).json({
       success: true,
-      message: 'Registration successful. OTP verification sent to email.',
+      message: 'Registration successful.',
       token: generateToken(user._id),
       user: {
         _id: user._id,
