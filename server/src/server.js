@@ -1,7 +1,7 @@
+import './loadEnv.js';
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import { initSocket } from './config/socket.js';
 
@@ -10,16 +10,6 @@ import authRoutes from './routes/auth.js';
 import commuterRoutes from './routes/routes.js';
 import matchRoutes from './routes/matches.js';
 import rideRoutes from './routes/rides.js';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Resolve directory name
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables
-dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // Connect to MongoDB
 connectDB();
