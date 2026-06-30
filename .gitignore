@@ -1,0 +1,18 @@
+# Dependency directories
+node_modules/
+
+# Local env files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build folders
+dist/
+build/
+.vite/
+
+# System files
+.DS_Store
+Thumbs.db
