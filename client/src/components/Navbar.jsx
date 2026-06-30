@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Car, LogOut, ShieldCheck, MapPin, Navigation } from 'lucide-react';
-import Counter from './ui/Counter';
+import { Car, LogOut, MapPin, Navigation } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -64,27 +63,16 @@ export default function Navbar() {
 
             <span className="h-4 w-px bg-brand-border/80 hidden md:block"></span>
 
-            {/* User Trust & verification badges */}
+            {/* User details */}
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end hidden sm:flex">
                 <span className="text-sm font-semibold text-white">{user.name}</span>
-                <span className="text-xs text-slate-400 flex items-center gap-1">
-                  {user.verified ? (
-                    <>
-                      <ShieldCheck size={12} className="text-brand-accent" />
-                      <span className="text-brand-accent font-medium">Verified Commuter</span>
-                    </>
-                  ) : (
-                    <span className="text-yellow-500 font-medium">Unverified Email</span>
-                  )}
+                <span className="text-[10px] text-slate-400 font-medium">
+                  {user.companyName ? `${user.companyName} • ` : ''}Trust Score: {user.trustScore}/100
                 </span>
               </div>
 
-              {/* Trust Score Badge */}
-              <div className="bg-[#15171b] px-3 py-1 rounded-full border border-[#1c1f24] flex items-center gap-1.5 cursor-pointer hover:border-brand-accent transition-colors" title="Your Commuter Trust Score">
-                <span className="text-xs font-medium text-slate-400">Trust</span>
-                <Counter value={user.trustScore} fontSize={12} textColor="#228a56" />
-              </div>
+
 
               {/* Logout */}
               <button

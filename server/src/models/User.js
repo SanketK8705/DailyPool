@@ -23,17 +23,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    otp: {
-      type: String,
-      default: null,
-    },
-    otpExpires: {
-      type: Date,
-      default: null,
-    },
     trustScore: {
       type: Number,
-      default: 100,
+      default: 50,
       min: 0,
       max: 100,
     },

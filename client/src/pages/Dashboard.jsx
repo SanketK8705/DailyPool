@@ -13,12 +13,10 @@ import {
   Users,
   Compass,
   ArrowRight,
-  ShieldCheck,
   Star,
   Activity,
   Plus,
   HelpCircle,
-  AlertTriangle,
 } from 'lucide-react';
 import SpotlightCard from '../components/ui/SpotlightCard';
 import BorderGlow from '../components/ui/BorderGlow';
@@ -39,7 +37,7 @@ const BENGALURU_CENTER = {
 const GOOGLE_LIBRARIES = ['places'];
 
 export default function Dashboard() {
-  const { user, token, verifyOTP, resendOTP } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
 
   // Data states
@@ -50,12 +48,6 @@ export default function Dashboard() {
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [directions, setDirections] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // OTP States
-  const [inlineOtp, setInlineOtp] = useState('');
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [otpError, setOtpError] = useState('');
-  const [otpSuccess, setOtpSuccess] = useState('');
 
   // Map settings
   const { isLoaded } = useJsApiLoader({
@@ -201,82 +193,13 @@ export default function Dashboard() {
     }
   };
 
-  const handleInlineOtpSubmit = async (e) => {
-    e.preventDefault();
-    setOtpLoading(true);
-    setOtpError('');
-    setOtpSuccess('');
-    const res = await verifyOTP(inlineOtp);
-    if (res.success) {
-      setOtpSuccess('Email verified successfully!');
-      setInlineOtp('');
-      // Refresh dashboard info
-      setTimeout(() => {
-        fetchDashboardData();
-        setOtpSuccess('');
-      }, 1500);
-    } else {
-      setOtpError(res.error || 'Invalid OTP code');
-    }
-    setOtpLoading(false);
-  };
+
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-transparent relative">
       {/* LEFT PANEL: Control Center */}
       <div className="w-full md:w-[480px] border-r border-brand-border/60 flex flex-col h-[calc(100vh-4rem)] overflow-y-auto px-6 py-6 shrink-0 relative z-20">
-        {/* Email verification reminder */}
-        {user && !user.verified && (
-          <div className="mb-5 bg-yellow-950/20 border border-yellow-800/60 px-4 py-4 rounded-xl text-xs text-yellow-200">
-            <div className="flex items-start gap-2.5">
-              <AlertTriangle size={16} className="text-yellow-500 shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="font-semibold text-sm">Verify corporate email address</p>
-                <p className="text-yellow-400/80 mt-1">Please enter the 6-digit OTP code to establish commuter circle trust.</p>
-                
-                {/* Inline OTP input form */}
-                <form onSubmit={handleInlineOtpSubmit} className="mt-3 flex items-center gap-2">
-                  <input
-                    type="text"
-                    maxLength="6"
-                    required
-                    value={inlineOtp}
-                    onChange={(e) => setInlineOtp(e.target.value.replace(/\D/g, ''))}
-                    placeholder="123456"
-                    className="bg-slate-950 border border-yellow-800/40 rounded-lg px-3 py-1.5 text-white font-bold text-center tracking-widest w-28 focus:outline-none focus:border-brand-accent text-xs"
-                  />
-                  <StarBorder
-                    type="submit"
-                    disabled={inlineOtp.length !== 6 || otpLoading}
-                    className="text-slate-900 font-bold px-3 py-1 text-xs shrink-0"
-                  >
-                    {otpLoading ? 'Verifying...' : 'Verify Code'}
-                  </StarBorder>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setOtpLoading(true);
-                      setOtpError('');
-                      setOtpSuccess('');
-                      const res = await resendOTP();
-                      if (res.success) {
-                        setOtpSuccess('New verification code sent to your email.');
-                      } else {
-                        setOtpError(res.error || 'Resend failed');
-                      }
-                      setOtpLoading(false);
-                    }}
-                    className="text-[10px] text-yellow-500 hover:underline font-semibold shrink-0 ml-1.5"
-                  >
-                    Resend Code
-                  </button>
-                </form>
-                {otpError && <p className="text-red-400 mt-2 text-[10px] font-semibold">{otpError}</p>}
-                {otpSuccess && <p className="text-brand-accent mt-2 text-[10px] font-semibold">{otpSuccess}</p>}
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Ongoing / Active Ride notification banner */}
         {activeRides.length > 0 && (
@@ -460,10 +383,9 @@ export default function Dashboard() {
                           <div>
                             <h4 className="text-sm font-bold text-white flex items-center gap-1.5 font-sans">
                               {partner.name}
-                              {partner.verified && <ShieldCheck size={14} className="text-brand-accent animate-pulse" />}
                             </h4>
                             <span className="text-[10px] text-slate-400 uppercase tracking-wider">
-                              {partner.companyName || 'Verified Commuter'}
+                              {partner.companyName || 'Commuter'} • Trust Score: {partner.trustScore}/100
                             </span>
                           </div>
                         </div>

@@ -33,8 +33,10 @@ export default function Login() {
     if (isRegister) {
       const res = await register(name, email, password, gender, companyName);
       if (res.success) {
-        setSuccessMsg(res.message);
-        setShowOtpScreen(true);
+        setSuccessMsg('Registration successful!');
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
       } else {
         setErrorMsg(res.error || 'Registration failed');
       }
@@ -124,10 +126,7 @@ export default function Login() {
 
         {/* Feature checks */}
         <div className="space-y-3 pt-2 text-xs text-slate-400">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-brand-accent rounded-full shrink-0"></span>
-            <span>OTP Verification establishes commuter trust circle</span>
-          </div>
+
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 bg-brand-accent rounded-full shrink-0"></span>
             <span>AI overlaps routes to calculate under 500m pickup detours</span>

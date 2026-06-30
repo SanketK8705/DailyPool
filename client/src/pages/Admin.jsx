@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import BorderGlow from '../components/ui/BorderGlow';
 import StarBorder from '../components/ui/StarBorder';
-import { Users, Car, ShieldAlert, Award, RefreshCw, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Users, Car, ShieldAlert, Award, RefreshCw } from 'lucide-react';
 
 export default function Admin() {
   const { token } = useAuth();
@@ -122,10 +122,7 @@ export default function Admin() {
               <thead>
                 <tr className="border-b border-gunmetal text-slate-400 uppercase tracking-widest font-bold text-[10px]">
                   <th className="py-3 px-4">User Details</th>
-                  <th className="py-3 px-4">Entity Email</th>
-                  <th className="py-3 px-4 text-center">Trust Index</th>
-                  <th className="py-3 px-4 text-center">OTP Circle Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4 text-right">Entity Email</th>
                 </tr>
               </thead>
               <tbody>
@@ -135,30 +132,7 @@ export default function Admin() {
                       {u.name}
                       <span className="block text-[10px] text-slate-500 font-medium mt-0.5">{u.companyName || 'Corporate'}</span>
                     </td>
-                    <td className="py-3 px-4 text-slate-300 font-medium">{u.email}</td>
-                    <td className="py-3 px-4 text-center">
-                      <span className="px-2 py-0.5 rounded bg-emerald-950/80 text-[#228a56] font-bold border border-[#228a56]/20">
-                        {u.trustScore}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        u.verified ? 'bg-emerald-950 text-brand-accent' : 'bg-yellow-950/70 text-yellow-500'
-                      }`}>
-                        {u.verified ? 'VERIFIED' : 'UNVERIFIED'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => handleToggleVerify(u._id)}
-                        className={`inline-flex items-center gap-1 text-xs font-semibold py-1 px-3 rounded-full transition-all ${
-                          u.verified ? 'text-yellow-500 hover:bg-yellow-950/30' : 'text-[#007afc] hover:bg-[#007afc]/10'
-                        }`}
-                      >
-                        {u.verified ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-                        {u.verified ? 'Unverify User' : 'Verify User'}
-                      </button>
-                    </td>
+                    <td className="py-3 px-4 text-right text-slate-300 font-medium">{u.email}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { Ride } from '../models/Ride.js';
-import { sendOTPEmail } from '../services/emailService.js';
+
 
 // Helper to generate JWT Token
 const generateToken = (id) => {
@@ -22,15 +22,16 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ success: false, error: 'User already exists' });
     }
 
-    // Automatically verify user on creation and start with 100 trust score
+    const domain = email.split('@')[1]?.toLowerCase() || '';
+
     const user = await User.create({
       name,
       email,
       password,
       gender,
-      companyName,
+      companyName: companyName || domain.split('.')[0],
       verified: true,
-      trustScore: 100,
+      trustScore: 50,
       homeLocation: { address: '', lat: 0, lng: 0 },
       officeLocation: { address: '', lat: 0, lng: 0 },
     });
@@ -54,46 +55,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Verify OTP for company/college email
-// @route   POST /api/auth/verify-otp
-// @access  Private
-export const verifyOTP = async (req, res) => {
-  try {
-    const { otp } = req.body;
-    const user = await User.findById(req.user._id);
 
-    if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
-    }
-
-    const isMasterOTP = otp === '123456';
-    if (!isMasterOTP && (!user.otp || user.otp !== otp || user.otpExpires < new Date())) {
-      return res.status(400).json({ success: false, error: 'Invalid or expired OTP code' });
-    }
-
-    // Mark user verified and award +20 trust score points
-    user.verified = true;
-    user.trustScore = Math.min(100, user.trustScore + 20);
-    user.otp = null;
-    user.otpExpires = null;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Email verified successfully! Trust score boosted (+20).',
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        verified: user.verified,
-        trustScore: user.trustScore,
-        companyName: user.companyName,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
 
 // @desc    Login user
 // @route   POST /api/auth/login
@@ -169,66 +131,7 @@ export const updateLocations = async (req, res) => {
   }
 };
 
-// @desc    Dev utility to fetch OTP for testing
-// @route   GET /api/auth/dev-otp/:email
-// @access  Public
-export const getDevOTP = async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.params.email });
-    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
-    
-    const now = new Date();
-    // If OTP is null, or it has expired, generate a fresh one
-    if (!user.otp || !user.otpExpires || user.otpExpires < now) {
-      const freshOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      user.otp = freshOtp;
-      user.otpExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours expiry for dev ease
-      await user.save();
-      console.log(`[DEV OPT REFRESHED] Generated fresh OTP for ${user.email}: ${freshOtp}`);
-    }
 
-    res.json({ success: true, email: user.email, otp: user.otp });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
-// @desc    Resend OTP verification code
-// @route   POST /api/auth/resend-otp
-// @access  Public/Private
-export const resendOTP = async (req, res) => {
-  try {
-    let email = req.body.email;
-    if (!email && req.headers.authorization) {
-      // If user is logged in, extract token and decode email
-      // But we can also check if req.user is set (optional auth middleware)
-    }
-
-    if (!email && req.user) {
-      email = req.user.email;
-    }
-
-    if (!email) {
-      return res.status(400).json({ success: false, error: 'Please provide email' });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otp = otp;
-    user.otpExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins expiry
-    await user.save();
-
-    await sendOTPEmail(email, otp, user.name);
-
-    res.json({ success: true, message: 'Fresh OTP verification code sent to your email.' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
 
 // @desc    Google OAuth login / signup callback handler
 // @route   POST /api/auth/google-oauth

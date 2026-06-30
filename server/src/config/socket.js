@@ -103,7 +103,7 @@ export const initSocket = (server) => {
         const passenger = await User.findById(ride.passengerId);
 
         if (driver) {
-          driver.trustScore = Math.min(100, driver.trustScore + 2);
+          driver.trustScore = Math.min(100, driver.trustScore + 3);
           driver.rideHistory.push({
             rideId: ride._id,
             role: 'driver',
@@ -113,7 +113,7 @@ export const initSocket = (server) => {
         }
 
         if (passenger) {
-          passenger.trustScore = Math.min(100, passenger.trustScore + 1);
+          passenger.trustScore = Math.min(100, passenger.trustScore + 2);
           passenger.rideHistory.push({
             rideId: ride._id,
             role: 'passenger',

@@ -98,57 +98,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // OTP Verification
-  const verifyOTP = async (otp) => {
-    setError(null);
-    try {
-      const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ otp }),
-      });
-      const data = await response.json();
 
-      if (data.success) {
-        setUser(data.user);
-        return { success: true, message: data.message };
-      } else {
-        setError(data.error);
-        return { success: false, error: data.error };
-      }
-    } catch (err) {
-      setError(err.message);
-      return { success: false, error: err.message };
-    }
-  };
-
-  // Resend OTP Code
-  const resendOTP = async (emailAddress = null) => {
-    setError(null);
-    try {
-      const targetEmail = emailAddress || user?.email;
-      const response = await fetch(`${API_URL}/api/auth/resend-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: targetEmail }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        return { success: true, message: data.message };
-      } else {
-        setError(data.error);
-        return { success: false, error: data.error };
-      }
-    } catch (err) {
-      setError(err.message);
-      return { success: false, error: err.message };
-    }
-  };
 
   // Update address coordinate defaults
   const updateLocations = async ({
@@ -206,8 +156,6 @@ export const AuthProvider = ({ children }) => {
         error,
         login,
         register,
-        verifyOTP,
-        resendOTP,
         updateLocations,
         logout,
       }}
